@@ -84,17 +84,21 @@ describe( `${ block.name } Block`, () => {
 			expect( products ).toHaveLength( 5 );
 		} );
 
-		it( 'should show only products that match the filter', async () => {
-			const isRefreshed = jest.fn( () => void 0 );
-			page.on( 'load', isRefreshed );
-			await page.click( selectors.frontend.filter );
-			await waitForAllProductsBlockLoaded();
-			const products = await page.$$( selectors.frontend.productsList );
+		for ( let i=1; i<=100; i++ ) {
+			it( 'should show only products that match the filter - ' + i, async () => {
+				const isRefreshed = jest.fn( () => void 0 );
+				page.on( 'load', isRefreshed );
 
-			expect( isRefreshed ).not.toBeCalled();
-			expect( products ).toHaveLength( 1 );
-			await expect( page ).toMatch( block.foundProduct );
-		} );
+				await page.waitForSelector( selectors.frontend.filter );
+				await page.click( selectors.frontend.filter );
+				await waitForAllProductsBlockLoaded();
+				const products = await page.$$( selectors.frontend.productsList );
+
+				expect( isRefreshed ).not.toBeCalled();
+				expect( products ).toHaveLength( 1 );
+				await expect( page ).toMatch( block.foundProduct );
+			} );
+		}
 	} );
 
 	describe( 'with PHP classic template ', () => {
@@ -135,35 +139,39 @@ describe( `${ block.name } Block`, () => {
 			expect( products ).toHaveLength( 5 );
 		} );
 
-		it( 'should show only products that match the filter', async () => {
-			const isRefreshed = jest.fn( () => void 0 );
-			page.on( 'load', isRefreshed );
+		for ( let i=1; i<=100; i++ ) {
+			it( 'should show only products that match the filter - ' + i, async () => {
+				const isRefreshed = jest.fn( () => void 0 );
+				page.on( 'load', isRefreshed );
 
-			await page.waitForSelector( block.class + '.is-loading', {
-				hidden: true,
+				await page.waitForSelector( block.class + '.is-loading', {
+					hidden: true,
+				} );
+
+				expect( isRefreshed ).not.toBeCalled();
+
+				await page.waitForSelector( selectors.frontend.filter );
+
+				await Promise.all( [
+					page.waitForNavigation(),
+					page.click( selectors.frontend.filter ),
+				] );
+
+				const products = await page.$$(
+					selectors.frontend.classicProductsList
+				);
+
+				const pageURL = page.url();
+				const parsedURL = new URL( pageURL );
+
+				expect( isRefreshed ).toBeCalledTimes( 1 );
+				expect( products ).toHaveLength( 1 );
+				await expect( page ).toMatch( block.foundProduct );
+				expect( parsedURL.search ).toEqual(
+					block.urlSearchParamWhenFilterIsApplied
+				);
 			} );
-
-			expect( isRefreshed ).not.toBeCalled();
-
-			await Promise.all( [
-				page.waitForNavigation(),
-				page.click( selectors.frontend.filter ),
-			] );
-
-			const products = await page.$$(
-				selectors.frontend.classicProductsList
-			);
-
-			const pageURL = page.url();
-			const parsedURL = new URL( pageURL );
-
-			expect( isRefreshed ).toBeCalledTimes( 1 );
-			expect( products ).toHaveLength( 1 );
-			await expect( page ).toMatch( block.foundProduct );
-			expect( parsedURL.search ).toEqual(
-				block.urlSearchParamWhenFilterIsApplied
-			);
-		} );
+		}
 
 		it( 'should refresh the page only if the user click on button', async () => {
 			await goToTemplateEditor( {
