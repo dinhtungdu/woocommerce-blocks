@@ -83,22 +83,6 @@ describe( `${ block.name } Block`, () => {
 
 			expect( products ).toHaveLength( 5 );
 		} );
-
-		for ( let i=1; i<=100; i++ ) {
-			it( 'should show only products that match the filter - ' + i, async () => {
-				const isRefreshed = jest.fn( () => void 0 );
-				page.on( 'load', isRefreshed );
-
-				await page.waitForSelector( selectors.frontend.filter );
-				await page.click( selectors.frontend.filter );
-				await waitForAllProductsBlockLoaded();
-				const products = await page.$$( selectors.frontend.productsList );
-
-				expect( isRefreshed ).not.toBeCalled();
-				expect( products ).toHaveLength( 1 );
-				await expect( page ).toMatch( block.foundProduct );
-			} );
-		}
 	} );
 
 	describe( 'with PHP classic template ', () => {
@@ -123,12 +107,15 @@ describe( `${ block.name } Block`, () => {
 			);
 			await canvasEl.click( selectors.editor.doneButton );
 			await saveTemplate();
-			await goToShopPage();
 		} );
 
 		afterAll( async () => {
 			await deleteAllTemplates( 'wp_template' );
 			await deleteAllTemplates( 'wp_template_part' );
+		} );
+
+		beforeEach( async () => {
+			await goToShopPage();
 		} );
 
 		it( 'should render', async () => {
