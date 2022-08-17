@@ -56,7 +56,6 @@ const setMaxPrice = async () => {
 	await page.keyboard.down( 'Shift' );
 	await page.keyboard.press( 'Home' );
 	await page.keyboard.up( 'Shift' );
-	await page.keyboard.press( 'Backspace' );
 	await page.keyboard.type( '1.99' );
 	await page.keyboard.press( 'Tab' );
 };
@@ -81,33 +80,33 @@ describe( `${ block.name } Block`, () => {
 			await page.goto( link );
 		} );
 
-		for ( let i = 1; i < 100; i++ ) {
-			it(
-				'should show only products that match the filter - ' + i,
-				async () => {
-					const isRefreshed = jest.fn( () => void 0 );
-					page.on( 'load', isRefreshed );
-					await setMaxPrice();
-					await expect( page ).toMatchElement(
-						'.wc-block-active-filters__title',
-						{
-							text: 'Active filters',
-						}
-					);
-					await waitForAllProductsBlockLoaded();
+		it( 'should render', async () => {
+			await waitForAllProductsBlockLoaded();
+			const products = await page.$$( selectors.frontend.productsList );
 
-					const products = await page.$$(
-						selectors.frontend.productsList
-					);
+			expect( products ).toHaveLength( 5 );
+		} );
 
-					expect( isRefreshed ).not.toBeCalled();
-
-					expect( products ).toHaveLength( 1 );
-
-					await expect( page ).toMatch( block.foundProduct );
+		it( 'should show only products that match the filter', async () => {
+			const isRefreshed = jest.fn( () => void 0 );
+			page.on( 'load', isRefreshed );
+			await setMaxPrice();
+			await expect( page ).toMatchElement(
+				'.wc-block-active-filters__title',
+				{
+					text: 'Active filters',
 				}
 			);
-		}
+			await waitForAllProductsBlockLoaded();
+
+			const products = await page.$$( selectors.frontend.productsList );
+
+			expect( isRefreshed ).not.toBeCalled();
+
+			expect( products ).toHaveLength( 1 );
+
+			await expect( page ).toMatch( block.foundProduct );
+		} );
 	} );
 
 	describe( 'with PHP classic template ', () => {
@@ -136,41 +135,91 @@ describe( `${ block.name } Block`, () => {
 			await deleteAllTemplates( 'wp_template_part' );
 		} );
 
-		for ( let i = 1; i < 100; i++ ) {
-			it( 'should show only products that match the filter', async () => {
-				const isRefreshed = jest.fn( () => void 0 );
-				page.on( 'load', isRefreshed );
+		it( 'should render', async () => {
+			const products = await page.$$(
+				selectors.frontend.classicProductsList
+			);
 
-				await page.waitForSelector( block.class + '.is-loading', {
-					hidden: true,
-				} );
+			expect( products ).toHaveLength( 5 );
+		} );
 
-				await expect( page ).toMatch( block.foundProduct );
-				expect( isRefreshed ).not.toBeCalled();
+		it( 'should show only products that match the filter', async () => {
+			const isRefreshed = jest.fn( () => void 0 );
+			page.on( 'load', isRefreshed );
 
-				await Promise.all( [
-					page.waitForNavigation(),
-					setMaxPrice(),
-				] );
-
-				await page.waitForSelector(
-					selectors.frontend.classicProductsList
-				);
-				const products = await page.$$(
-					selectors.frontend.classicProductsList
-				);
-
-				const pageURL = page.url();
-				const parsedURL = new URL( pageURL );
-
-				expect( isRefreshed ).toBeCalledTimes( 1 );
-				expect( products ).toHaveLength( 1 );
-
-				expect( parsedURL.search ).toEqual(
-					block.urlSearchParamWhenFilterIsApplied
-				);
-				await expect( page ).toMatch( block.foundProduct );
+			await page.waitForSelector( block.class + '.is-loading', {
+				hidden: true,
 			} );
-		}
+
+			await expect( page ).toMatch( block.foundProduct );
+			expect( isRefreshed ).not.toBeCalled();
+
+			await Promise.all( [ page.waitForNavigation(), setMaxPrice() ] );
+
+			await page.waitForSelector(
+				selectors.frontend.classicProductsList
+			);
+			const products = await page.$$(
+				selectors.frontend.classicProductsList
+			);
+
+			const pageURL = page.url();
+			const parsedURL = new URL( pageURL );
+
+			expect( isRefreshed ).toBeCalledTimes( 1 );
+			expect( products ).toHaveLength( 1 );
+
+			expect( parsedURL.search ).toEqual(
+				block.urlSearchParamWhenFilterIsApplied
+			);
+			await expect( page ).toMatch( block.foundProduct );
+		} );
+
+		it( 'should refresh the page only if the user click on button', async () => {
+			await goToTemplateEditor( {
+				postId: productCatalogTemplateId,
+			} );
+
+			await selectBlockByName( block.slug );
+			await openBlockEditorSettings( { isFSEEditor: true } );
+			await page.waitForXPath(
+				block.selectors.editor.filterButtonToggle
+			);
+			const [ filterButtonToggle ] = await page.$x(
+				block.selectors.editor.filterButtonToggle
+			);
+			await filterButtonToggle.click();
+			await saveTemplate();
+			await goToShopPage();
+
+			const isRefreshed = jest.fn( () => void 0 );
+			page.on( 'load', isRefreshed );
+			await page.waitForSelector( block.class + '.is-loading', {
+				hidden: true,
+			} );
+			expect( isRefreshed ).not.toBeCalled();
+
+			await setMaxPrice();
+
+			await clickLink( selectors.frontend.submitButton );
+
+			await page.waitForSelector(
+				selectors.frontend.classicProductsList
+			);
+
+			const products = await page.$$(
+				selectors.frontend.classicProductsList
+			);
+
+			const pageURL = page.url();
+			const parsedURL = new URL( pageURL );
+
+			expect( isRefreshed ).toBeCalledTimes( 1 );
+			expect( products ).toHaveLength( 1 );
+			await expect( page ).toMatch( block.foundProduct );
+			expect( parsedURL.search ).toEqual(
+				block.urlSearchParamWhenFilterIsApplied
+			);
+		} );
 	} );
 } );
