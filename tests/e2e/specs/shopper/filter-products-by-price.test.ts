@@ -143,37 +143,39 @@ describe( `${ block.name } Block`, () => {
 			expect( products ).toHaveLength( 5 );
 		} );
 
-		it( 'should show only products that match the filter', async () => {
-			const isRefreshed = jest.fn( () => void 0 );
-			page.on( 'load', isRefreshed );
+		for ( let i=1; i<=100; i++ ) {
+			it( 'should show only products that match the filter - ' + i, async () => {
+				const isRefreshed = jest.fn( () => void 0 );
+				page.on( 'load', isRefreshed );
 
-			await page.waitForSelector( block.class + '.is-loading', {
-				hidden: true,
+				await page.waitForSelector( block.class + '.is-loading', {
+					hidden: true,
+				} );
+
+				await expect( page ).toMatch( block.foundProduct );
+				expect( isRefreshed ).not.toBeCalled();
+
+				await Promise.all( [ page.waitForNavigation(), setMaxPrice() ] );
+
+				await page.waitForSelector(
+					selectors.frontend.classicProductsList
+				);
+				const products = await page.$$(
+					selectors.frontend.classicProductsList
+				);
+
+				const pageURL = page.url();
+				const parsedURL = new URL( pageURL );
+
+				expect( isRefreshed ).toBeCalledTimes( 1 );
+				expect( products ).toHaveLength( 1 );
+
+				expect( parsedURL.search ).toEqual(
+					block.urlSearchParamWhenFilterIsApplied
+				);
+				await expect( page ).toMatch( block.foundProduct );
 			} );
-
-			await expect( page ).toMatch( block.foundProduct );
-			expect( isRefreshed ).not.toBeCalled();
-
-			await Promise.all( [ page.waitForNavigation(), setMaxPrice() ] );
-
-			await page.waitForSelector(
-				selectors.frontend.classicProductsList
-			);
-			const products = await page.$$(
-				selectors.frontend.classicProductsList
-			);
-
-			const pageURL = page.url();
-			const parsedURL = new URL( pageURL );
-
-			expect( isRefreshed ).toBeCalledTimes( 1 );
-			expect( products ).toHaveLength( 1 );
-
-			expect( parsedURL.search ).toEqual(
-				block.urlSearchParamWhenFilterIsApplied
-			);
-			await expect( page ).toMatch( block.foundProduct );
-		} );
+		}
 
 		it( 'should refresh the page only if the user click on button', async () => {
 			await goToTemplateEditor( {
