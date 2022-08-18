@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
- import {
+import {
 	createNewPost,
 	deleteAllTemplates,
 	insertBlock,
@@ -56,6 +56,17 @@ const setMaxPrice = async () => {
 	await page.keyboard.down( 'Shift' );
 	await page.keyboard.press( 'Home' );
 	await page.keyboard.up( 'Shift' );
+	await page.keyboard.type( '1.99' );
+	await page.keyboard.press( 'Tab' );
+};
+
+const setMaxPriceLegacy = async () => {
+	await page.waitForSelector( selectors.frontend.priceMaxAmount );
+	await page.focus( selectors.frontend.priceMaxAmount );
+	await page.keyboard.down( 'Shift' );
+	await page.keyboard.press( 'Home' );
+	await page.keyboard.up( 'Shift' );
+	await page.keyboard.press( 'Backspace' );
 	await page.keyboard.type( '1.99' );
 	await page.keyboard.press( 'Tab' );
 };
@@ -156,6 +167,40 @@ describe( `${ block.name } Block`, () => {
 				expect( isRefreshed ).not.toBeCalled();
 
 				await Promise.all( [ page.waitForNavigation(), setMaxPrice() ] );
+
+				await page.waitForSelector(
+					selectors.frontend.classicProductsList
+				);
+				const products = await page.$$(
+					selectors.frontend.classicProductsList
+				);
+
+				const pageURL = page.url();
+				const parsedURL = new URL( pageURL );
+
+				expect( isRefreshed ).toBeCalledTimes( 1 );
+				expect( products ).toHaveLength( 1 );
+
+				expect( parsedURL.search ).toEqual(
+					block.urlSearchParamWhenFilterIsApplied
+				);
+				await expect( page ).toMatch( block.foundProduct );
+			} );
+		}
+
+		for ( let i=1; i<=100; i++ ) {
+			it( 'Legacy - should show only products that match the filter - ' + i, async () => {
+				const isRefreshed = jest.fn( () => void 0 );
+				page.on( 'load', isRefreshed );
+
+				await page.waitForSelector( block.class + '.is-loading', {
+					hidden: true,
+				} );
+
+				await expect( page ).toMatch( block.foundProduct );
+				expect( isRefreshed ).not.toBeCalled();
+
+				await Promise.all( [ page.waitForNavigation(), setMaxPriceLegacy() ] );
 
 				await page.waitForSelector(
 					selectors.frontend.classicProductsList
