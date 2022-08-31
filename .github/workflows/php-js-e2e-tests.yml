@@ -65,7 +65,7 @@ jobs:
                   chmod -R 767 ./ #needed for permissions issues
                   node ./bin/wp-env-with-gutenberg.js
                   npm run wp-env start
-                  npm run test:e2e -- tests/e2e/specs/shopper/filter-products-by-price.test.ts
+                  npm run test:e2e -- tests/e2e/specs/shopper/product-search.test.ts
             - name: Upload artifacts on failure
               if: ${{ failure() }}
               uses: actions/upload-artifact@v3
