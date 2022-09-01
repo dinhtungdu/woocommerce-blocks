@@ -67,7 +67,6 @@ jobs:
                   npm run wp-env start
                   npm run test:e2e -- tests/e2e/specs/shopper/product-search.test.ts
             - name: Upload artifacts on failure
-              if: ${{ failure() }}
               uses: actions/upload-artifact@v3
               with:
                   name: e2e-with-gutenberg-test-report

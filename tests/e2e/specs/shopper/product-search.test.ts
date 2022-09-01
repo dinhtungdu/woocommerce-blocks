@@ -28,8 +28,8 @@ for ( let i=1; i<=100; i++ ) {
 				await page.type( '.wp-block-search input[name="s"]', 'Stick' );
 
 				await Promise.all( [
-					page.keyboard.press( 'Enter' ),
 					page.waitForNavigation(),
+					page.keyboard.press( 'Enter' ),
 				] );
 
 				await expect( page ).toMatchElement( 'ul.products.columns-3' );
