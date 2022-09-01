@@ -29,9 +29,9 @@ describeOrSkip( GUTENBERG_EDITOR_CONTEXT === 'gutenberg' )(
 
 			await expect( page ).toMatchElement( 'ul.products.columns-3' );
 
-			// const products = await page.$$( 'ul.products.columns-3 > li' );
+			const products = await page.$$( 'ul.products.columns-3 > li' );
 
-			// expect( products ).toHaveLength( 2 );
+			expect( products ).toHaveLength( 2 );
 
 			expect( page ).toMatchElement( 'ul.products.columns-3 > li', {
 				text: '128GB USB Stick',
