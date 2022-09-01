@@ -19,11 +19,11 @@ for ( let i=1; i<=100; i++ ) {
 				await page.waitForSelector( '.wp-block-search' );
 			} );
 
-			it( 'should render product variation', async () => {
-				await expect( page ).toMatchElement(
-					'input[name="post_type"][value="product"]'
-				);
-			} );
+			// it( 'should render product variation', async () => {
+			// 	await expect( page ).toMatchElement(
+			// 		'input[name="post_type"][value="product"]'
+			// 	);
+			// } );
 
 			it( 'should be able to search for products', async () => {
 				await page.type( '.wp-block-search input[name="s"]', 'Stick' );
@@ -35,15 +35,15 @@ for ( let i=1; i<=100; i++ ) {
 
 				await page.waitForSelector( 'ul.products.columns-3' );
 
-				await expect( page ).toMatchElement( 'ul.products.columns-3' );
+				// await expect( page ).toMatchElement( 'ul.products.columns-3' );
 
-				const products = await page.$$( 'ul.products.columns-3 > li' );
+				// const products = await page.$$( 'ul.products.columns-3 > li' );
 
-				expect( products ).toHaveLength( 2 );
+				// expect( products ).toHaveLength( 2 );
 
-				expect( page ).toMatchElement( 'ul.products.columns-3 > li', {
-					text: '128GB USB Stick',
-				} );
+				// expect( page ).toMatchElement( 'ul.products.columns-3 > li', {
+				// 	text: '128GB USB Stick',
+				// } );
 			} );
 		}
 	);
