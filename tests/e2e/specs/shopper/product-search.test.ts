@@ -18,13 +18,6 @@ for ( let i=1; i<=100; i++ ) {
 				await shopper.block.goToBlockPage( block.name );
 			} );
 
-			it( 'should render product variation', async () => {
-				await page.waitForSelector( '.wp-block-search' );
-				await expect( page ).toMatchElement(
-					'input[name="post_type"][value="product"]'
-				);
-			} );
-
 			it( 'should be able to search for products', async () => {
 				await page.type( '.wp-block-search input[name="s"]', 'Stick' );
 
