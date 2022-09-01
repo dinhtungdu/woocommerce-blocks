@@ -3,6 +3,7 @@
  */
 import { GUTENBERG_EDITOR_CONTEXT, describeOrSkip } from '../../utils';
 import { shopper } from '../../../utils';
+import { getTextContent } from '../../page-utils';
 
 const block = {
 	name: 'Product Search',
