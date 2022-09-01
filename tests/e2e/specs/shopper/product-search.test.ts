@@ -19,11 +19,12 @@ for ( let i=1; i<=100; i++ ) {
 				await page.waitForSelector( '.wp-block-search' );
 			} );
 
-			// it( 'should render product variation', async () => {
-			// 	await expect( page ).toMatchElement(
-			// 		'input[name="post_type"][value="product"]'
-			// 	);
-			// } );
+			it( 'should render product variation', async () => {
+				const postType = page.$eval('input[name="post_type"]', (input) => {
+					return input.getAttribute("value")
+					});
+					expect( postType ).toBe( 'product' );
+			} );
 
 			it( 'should be able to search for products', async () => {
 				await page.type( '.wp-block-search input[name="s"]', 'Stick' );
