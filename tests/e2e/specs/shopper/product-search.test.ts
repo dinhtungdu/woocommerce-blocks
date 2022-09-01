@@ -34,10 +34,6 @@ for ( let i=1; i<=100; i++ ) {
 
 				await expect( page ).toMatchElement( 'ul.products.columns-3' );
 
-				const products = await page.$$( 'ul.products.columns-3 > li' );
-
-				expect( products ).toHaveLength( 2 );
-
 				expect( page ).toMatchElement( 'ul.products.columns-3 > li', {
 					text: '128GB USB Stick',
 				} );
