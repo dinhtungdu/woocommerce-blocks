@@ -15,15 +15,15 @@ for ( let i=1; i<=100; i++ ) {
 		`Shopper → Product Search - ${i}`,
 		() => {
 			beforeEach( async () => {
-				await shopper.block.goToBlockPage( block.name );
+				await shopper.block.goToBlockPage( 'Product Search' );
 				await page.waitForSelector( '.wp-block-search' );
 			} );
 
 			it( 'should render product variation', async () => {
-				const postType = page.$eval('input[name="post_type"]', (input) => {
-					return input.getAttribute("value")
-					});
-					expect( postType ).toBe( 'product' );
+				const [ postType ] = await getTextContent(
+					'.wp-block-search input[name="post_type"]'
+				);
+				await expect( postType ).toBe( 'product' );
 			} );
 
 			it( 'should be able to search for products', async () => {
@@ -34,17 +34,16 @@ for ( let i=1; i<=100; i++ ) {
 					page.keyboard.press( 'Enter' ),
 				] );
 
-				await page.waitForSelector( 'ul.products.columns-3' );
+				const products = await page.$$( 'ul.products.columns-3 > li' );
 
-				// await expect( page ).toMatchElement( 'ul.products.columns-3' );
+				expect( products ).toHaveLength( 2 );
 
-				// const products = await page.$$( 'ul.products.columns-3 > li' );
+				const productTitles = await getTextContent(
+					'ul.products.columns-3 .woocommerce-loop-product__title'
+				);
 
-				// expect( products ).toHaveLength( 2 );
-
-				// expect( page ).toMatchElement( 'ul.products.columns-3 > li', {
-				// 	text: '128GB USB Stick',
-				// } );
+				expect( productTitles ).toContain( '32GB USB Stick' );
+				expect( productTitles ).toContain( '128GB USB Stick' );
 			} );
 		}
 	);
