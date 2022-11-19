@@ -46,6 +46,7 @@ jobs:
 
             - name: generate trunk checkstyle
               run: |
+                  npm ci
                   npm run ts:log-errors
                   mv checkstyle.xml $HOME/checkstyle-trunk.xml
 
