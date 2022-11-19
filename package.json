@@ -169,7 +169,7 @@
 		"core-js": "3.25.0",
 		"create-file-webpack": "1.0.2",
 		"cross-env": "7.0.3",
-		"cssnano": "5.1.12",
+		"cssnano": "5.1.14",
 		"deep-freeze": "0.0.1",
 		"eslint-import-resolver-typescript": "3.2.4",
 		"eslint-import-resolver-webpack": "0.13.2",
