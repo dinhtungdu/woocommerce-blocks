@@ -15,22 +15,13 @@ const runner = async () => {
 	const fileName = getInput( 'compare', {
 		required: true,
 	} );
+	const trunk = getInput( 'trunk', {
+		required: true,
+	} );
 
 	const newCheckStyleFile = fs.readFileSync( fileName );
 	const newCheckStyleFileParsed = parseXml( newCheckStyleFile );
-	const currentCheckStyleFile = await getFileContent( {
-		octokit,
-		owner,
-		repo,
-		fileName,
-		onFail: setFailed,
-	} );
-
-	if ( ! currentCheckStyleFile.data ) {
-		setFailed( 'No Content Available' );
-		return;
-	}
-
+	const currentCheckStyleFile = fs.readFileSync( trunk );
 	const currentCheckStyleFileContentParsed = parseXml(
 		currentCheckStyleFile.data
 	);
