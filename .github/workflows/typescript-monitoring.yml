@@ -34,7 +34,7 @@ jobs:
               run: |
                   npm ci
                   npm run ts:log-errors
-                  mv checkstyle.xml checkstyle-branch.xml
+                  mv checkstyle.xml $HOME/checkstyle-branch.xml
 
             - name: Get branch name
               id: branch-name
@@ -44,18 +44,17 @@ jobs:
               with:
                   ref: 'trunk'
 
-            - name: npm install - trunk
+            - name: generate trunk checkstyle
               run: |
-                  npm ci
                   npm run ts:log-errors
-                  mv checkstyle.xml checkstyle-trunk.xml
+                  mv checkstyle.xml $HOME/checkstyle-trunk.xml
 
             - name: Monitor TypeScript errors
               uses: ./.github/monitor-typescript-errors
               with:
                   repo-token: '${{ secrets.GITHUB_TOKEN }}'
-                  compare: checkstyle-branch.xml
-                  trunk: checkstyle-trunk.xml
+                  compare: $HOME/checkstyle-branch.xml
+                  trunk: $HOME/checkstyle-trunk.xml
               env:
                   AIRTABLE_API_KEY: ${{ secrets.AIRTABLE_API_KEY }}
                   CURRENT_BRANCH: ${{ steps.branch-name.outputs.current_branch }}
