@@ -54,8 +54,8 @@ jobs:
               uses: ./.github/monitor-typescript-errors
               with:
                   repo-token: '${{ secrets.GITHUB_TOKEN }}'
-                  compare: $HOME/checkstyle-branch.xml
-                  trunk: $HOME/checkstyle-trunk.xml
+                  compare: ${{ $HOME }}/checkstyle-branch.xml
+                  trunk: ${{ $HOME }}/checkstyle-trunk.xml
               env:
                   AIRTABLE_API_KEY: ${{ secrets.AIRTABLE_API_KEY }}
                   CURRENT_BRANCH: ${{ steps.branch-name.outputs.current_branch }}
