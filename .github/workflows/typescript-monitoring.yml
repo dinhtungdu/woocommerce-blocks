@@ -8,9 +8,10 @@ jobs:
     check-typescript-errors-with-trunk:
         runs-on: ubuntu-latest
         steps:
-            - uses: actions/checkout@v2
+            - uses: actions/checkout@v3
               with:
-                  ref: ${{ github.event.pull_request.head.ref }}
+                  ref: 'trunk'
+
 
             - name: Cache node modules
               uses: actions/cache@v3
@@ -34,22 +35,20 @@ jobs:
               run: |
                   npm ci
                   npm run ts:log-errors
-                  mv checkstyle.xml $HOME/checkstyle-branch.xml
+                  mv checkstyle.xml $HOME/checkstyle-trunk.xml
+
+            - uses: actions/checkout@v3
+
+            - name: generate checkstyle
+              run: |
+                  npm ci
+                  npm run ts:log-errors
+                  mv checkstyle.xml checkstyle-branch.xml
+                  mv $HOME/checkstyle-trunk.xml .
 
             - name: Get branch name
               id: branch-name
               uses: tj-actions/branch-names@v6
-
-            - uses: actions/checkout@v2
-              with:
-                  ref: 'trunk'
-
-            - name: generate trunk checkstyle
-              run: |
-                  npm ci
-                  npm run ts:log-errors
-                  mv checkstyle.xml checkstyle-trunk.xml
-                  mv $HOME/checkstyle-branch.xml .
 
             - name: Monitor TypeScript errors
               uses: ./.github/monitor-typescript-errors
