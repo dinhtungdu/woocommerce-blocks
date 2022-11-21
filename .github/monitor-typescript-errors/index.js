@@ -15,15 +15,15 @@ const runner = async () => {
 	const fileName = getInput( 'compare', {
 		required: true,
 	} );
-	const trunk = getInput( 'trunk', {
+	const trunkFileName = getInput( 'trunk', {
 		required: true,
 	} );
 
 	const newCheckStyleFile = fs.readFileSync( fileName );
 	const newCheckStyleFileParsed = parseXml( newCheckStyleFile );
-	const currentCheckStyleFile = fs.readFileSync( trunk );
+	const currentCheckStyleFile = fs.readFileSync( trunkFileName );
 	const currentCheckStyleFileContentParsed = parseXml(
-		currentCheckStyleFile.data
+		currentCheckStyleFile
 	);
 
 	const { header } = generateMarkdownMessage( newCheckStyleFileParsed );
