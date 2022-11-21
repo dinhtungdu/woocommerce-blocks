@@ -44,7 +44,8 @@ jobs:
                   npm ci
                   npm run ts:log-errors
                   mv checkstyle.xml checkstyle-branch.xml
-                  mv $HOME/checkstyle-trunk.xml .
+                  mv $HOME/checkstyle-trunk.xml checkstyle-trunk.xml
+                  ls -l checkstyle*
 
             - name: Get branch name
               id: branch-name
