@@ -10,14 +10,6 @@ jobs:
     name: Playwright E2E tests
     timeout-minutes: 60
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: true
-      max-parallel: 1
-      matrix:
-        config: [
-          { name: Normal, file: playwright.config.ts },
-          { name: SideEffects, file: playwright.side-effects.config.ts },
-        ]
     steps:
 
       - uses: actions/checkout@v3
@@ -79,13 +71,15 @@ jobs:
         run: npm run env:start
 
       - name: Run Playwright tests
-        run: npm run test:e2e -- --config=tests/e2e/${{ matrix.config.file }}
+        run: |
+          npm run test:e2e
+          npm run test:e2e -- --config=tests/e2e/playwright.side-effects.config.ts
 
       - uses: actions/upload-artifact@v3
         if: ${{ failure() }}
 
         with:
-          name: playwright-report-${{ matrix.config.name }}
+          name: playwright-report
           path: artifacts/test-results
           if-no-files-found: error # 'warn' or 'ignore' are also available, defaults to `warn`
 
